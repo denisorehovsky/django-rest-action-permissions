@@ -1,0 +1,7 @@
+__version__ = '1.0.0'
+__title__ = 'django-rest-action-permissions'
+__description__ = 'Action based permissions for Django REST Framework.'
+__url__ = 'https://github.com/apirobot/django-rest-action-permissions'
+__author__ = 'Denis Orehovsky'
+__author_email__ = 'denis.orehovsky@gmail.com'
+__license__ = 'MIT License'

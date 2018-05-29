@@ -1,0 +1,33 @@
+sudo: false
+language: python
+cache: pip
+
+matrix:
+  fast_finish: true
+  include:
+    - python: 2.7
+      env: TOXENV=py27-django111-drf37
+
+    - python: 3.5
+      env: TOXENV=py35-django111-drf37
+    - python: 3.5
+      env: TOXENV=py35-django20-drf37
+    - python: 3.5
+      env: TOXENV=py35-djangomaster-drf37
+
+    - python: 3.6
+      env: TOXENV=py36-django111-drf37
+    - python: 3.6
+      env: TOXENV=py36-django20-drf37
+    - python: 3.6
+      env: TOXENV=py36-djangomaster-drf37
+
+install:
+  - travis_retry pip install -U tox-travis
+
+script:
+  - tox
+
+after_success:
+  - travis_retry pip install -U codecov
+  - codecov
