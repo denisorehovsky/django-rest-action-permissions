@@ -65,20 +65,32 @@ Corresponding ViewSet for the permissions defined above:
 .. code-block:: python
 
     # views.py
-    class UserViewSet(mixins.RetrieveModelMixin,
-                      mixins.UpdateModelMixin,
-                      mixins.ListModelMixin,
-                      viewsets.GenericViewSet):
-        queryset = User.objects.all()
-        serializer_class = UserSerializer
-        permission_classes = (UserPermission, )
+    from rest_framework import viewsets, mixins
+    from rest_framework.decorators import detail_route
+    from .models import Tweet
+    from .permissions import TweetPermission
+    from .serializers import TweetSerializer
+
+
+    class TweetViewSet(mixins.CreateModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.ListModelMixin,
+                       mixins.UpdateModelMixin,
+                       mixins.DestroyModelMixin,
+                       viewsets.GenericViewSet):
+        queryset = Tweet.objects.all()
+        serializer_class = TweetSerializer
+        permission_classes = (TweetPermission, )
+
+        def perform_create(self, serializer):
+            serializer.save(owner=self.request.user)
 
         @detail_route(methods=['POST'])
-        def follow(self, request, *args, **kwargs):
+        def retweet(self, request, *args, **kwargs):
             ...
 
         @detail_route(methods=['POST'])
-        def unfollow(self, request, *args, **kwargs):
+        def undo_retweet(self, request, *args, **kwargs):
             ...
 
 
