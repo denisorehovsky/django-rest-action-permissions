@@ -29,7 +29,6 @@ This library lets you define permissions like so:
 .. code-block:: python
 
     # permissions.py
-
     from rest_action_permissions.components import (
         ActionPermissionComponent, AllowAny, IsAuthenticated, IsSuperUser
     )
@@ -66,7 +65,6 @@ Corresponding ViewSet for the permissions defined above:
 .. code-block:: python
 
     # views.py
-
     class UserViewSet(mixins.RetrieveModelMixin,
                       mixins.UpdateModelMixin,
                       mixins.ListModelMixin,
