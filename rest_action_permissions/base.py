@@ -1,8 +1,9 @@
 import abc
+from six import with_metaclass
 from .mixins import EvaluatePermissionsMixin
 
 
-class BasePermission(metaclass=abc.ABCMeta):
+class BasePermission(with_metaclass(abc.ABCMeta)):
     """
     A base class from which all permission classes should inherit.
     """
@@ -16,7 +17,7 @@ class BasePermission(metaclass=abc.ABCMeta):
         pass
 
 
-class BaseComponent(BasePermission, metaclass=abc.ABCMeta):
+class BaseComponent(with_metaclass(abc.ABCMeta, BasePermission)):
     """
     A base class from which all component classes should inherit.
     """

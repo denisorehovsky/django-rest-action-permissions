@@ -76,6 +76,7 @@ setup(
     install_requires=[
         'django',
         'djangorestframework',
+        'six',
     ],
     include_package_data=True,
     classifiers=[
