@@ -1,0 +1,2 @@
+ignore:
+  - "rest_action_permissions/__version__.py"
