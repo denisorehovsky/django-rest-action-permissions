@@ -20,6 +20,10 @@ Installation
 
 Install using pip:
 
+.. code-block:: bash
+
+    $ pip install django-rest-action-permissions
+
 
 Usage
 -----
