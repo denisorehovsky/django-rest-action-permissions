@@ -51,7 +51,7 @@ This library lets you define permissions like so:
         list_perms = AllowAny()
         update_perms = IsTweetOwner()
         delete_perms = IsTweetOwner()
-        retweet_perms = IsAuthenticated() & ~IsTweetOwner()
+        retweet_perms = IsAuthenticated()
         undo_retweet_perms = IsAuthenticated()
 
         # General read/write permissions.
@@ -65,19 +65,14 @@ Corresponding ViewSet for the permissions defined above:
 .. code-block:: python
 
     # views.py
-    from rest_framework import viewsets, mixins
+    from rest_framework import viewsets
     from rest_framework.decorators import detail_route
     from .models import Tweet
     from .permissions import TweetPermission
     from .serializers import TweetSerializer
 
 
-    class TweetViewSet(mixins.CreateModelMixin,
-                       mixins.RetrieveModelMixin,
-                       mixins.ListModelMixin,
-                       mixins.UpdateModelMixin,
-                       mixins.DestroyModelMixin,
-                       viewsets.GenericViewSet):
+    class TweetViewSet(viewsets.ModelViewSet):
         queryset = Tweet.objects.all()
         serializer_class = TweetSerializer
         permission_classes = (TweetPermission, )
@@ -104,6 +99,8 @@ ActionPermissionComponent class is similar to the standard BasePermission class 
     FirstPermissionComponent() & SecondPermissionComponent()  # And
     FirstPermissionComponent() | SecondPermissionComponent()  # Or
     ~FirstPermissionComponent()  # Not
+
+**DANGER!** I don't recommend you to combine ``Not`` operator with operators ``And`` or ``Or``. It may cause errors in your permissions because of the way the django rest framework views are designed.
 
 
 Credits
