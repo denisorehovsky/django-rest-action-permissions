@@ -33,35 +33,35 @@ This library lets you define permissions like so:
 .. code-block:: python
 
     # permissions.py
-    from rest_action_permissions.components import (
-        ActionPermissionComponent, AllowAny, IsAuthenticated, IsSuperUser
+    from rest_framework.permissions import (
+        AllowAny, BasePermission, IsAdminUser, IsAuthenticated
     )
     from rest_action_permissions.permissions import ActionPermission
 
 
-    class IsTweetOwner(ActionPermissionComponent):
+    class IsTweetOwner(BasePermission):
 
         def has_object_permission(self, request, view, obj):
             return obj.owner == request.user
 
 
     class TweetPermission(ActionPermission):
-        # The superuser has all permissions.
-        enough_perms = IsSuperUser()
+        # The admin user has all permissions.
+        enough_perms = IsAdminUser
 
         # Corresponding permissions for each action.
-        create_perms = IsAuthenticated()
-        retrieve_perms = AllowAny()
-        list_perms = AllowAny()
-        update_perms = IsTweetOwner()
-        delete_perms = IsTweetOwner()
-        retweet_perms = IsAuthenticated()
-        undo_retweet_perms = IsAuthenticated()
+        create_perms = IsAuthenticated
+        retrieve_perms = AllowAny
+        list_perms = AllowAny
+        update_perms = IsTweetOwner
+        delete_perms = IsTweetOwner
+        retweet_perms = IsAuthenticated
+        undo_retweet_perms = IsAuthenticated
 
         # General read/write permissions.
         # Used if corresponding action permission hasn't been specified.
-        read_perms = AllowAny()
-        write_perms = IsAuthenticated() & IsTweetOwner()
+        read_perms = AllowAny
+        write_perms = IsAuthenticated & IsTweetOwner
 
 
 Corresponding ViewSet for the permissions defined above:
@@ -91,20 +91,6 @@ Corresponding ViewSet for the permissions defined above:
         @detail_route(methods=['POST'])
         def undo_retweet(self, request, *args, **kwargs):
             ...
-
-
-Difference between ActionPermissionComponent and BasePermission
----------------------------------------------------------------
-
-ActionPermissionComponent class is similar to the standard BasePermission class from the django rest framework. But in addition, you can combine your ActionPermissionComponent instances together using &, |, ~ operators:
-
-.. code-block:: python
-
-    FirstPermissionComponent() & SecondPermissionComponent()  # And
-    FirstPermissionComponent() | SecondPermissionComponent()  # Or
-    ~FirstPermissionComponent()  # Not
-
-**DANGER!** I don't recommend you to combine ``Not`` operator with operators ``And`` or ``Or``. It may cause errors in your permissions because of the way the django rest framework views are designed.
 
 
 Credits

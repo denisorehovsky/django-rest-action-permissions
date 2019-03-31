@@ -1,19 +1,17 @@
 import inspect
-import functools
-import operator
 from django.core.exceptions import ImproperlyConfigured
 from rest_framework import permissions
-from .base import BaseComponent, BasePermission
-from .mixins import EvaluatePermissionsMixin
 
 
-class ActionPermission(EvaluatePermissionsMixin, BasePermission):
+class ActionPermission:
 
-    def evaluate_permissions(
-        self, permission_name, request, view, *args, **kwargs
-    ):
+    def has_permission(self, request, view):
         perms = self._get_required_permissions(request, view)
-        return getattr(perms, permission_name)(request, view, *args, **kwargs)
+        return perms.has_permission(request, view)
+
+    def has_object_permission(self, request, view, obj):
+        perms = self._get_required_permissions(request, view)
+        return perms.has_object_permission(request, view, obj)
 
     def _get_required_permissions(self, request, view):
         action = self._get_action(view.action)
@@ -47,15 +45,13 @@ class ActionPermission(EvaluatePermissionsMixin, BasePermission):
         if enough_perms is not None:
             perms = enough_perms | perms
 
-        return perms
+        return perms()
 
     def _get_permissions_by_attr(self, attr):
         if not hasattr(self, attr):
             return None
         perms = getattr(self, attr)
-        perms = self._validate_permissions(
-            perms=perms, attr=attr
-        )
+        self._validate_permissions(perms=perms, attr=attr)
         return perms
 
     def _get_action(self, action):
@@ -68,17 +64,19 @@ class ActionPermission(EvaluatePermissionsMixin, BasePermission):
         return action
 
     def _validate_permissions(self, perms, attr):
-        if isinstance(perms, BaseComponent):
-            return perms
-        elif isinstance(perms, (tuple, list)):
-            validated_perms = (self._validate_permissions(perm, attr)
-                               for perm in perms)
-            # If we have a list of components, then we need to convert them
-            # into one single component using `And` operator.
-            return functools.reduce(operator.and_, validated_perms)
-        elif inspect.isclass(perms) and issubclass(perms, BaseComponent):
-            return perms()
-        else:
+        if (
+            not (
+                inspect.isclass(perms)
+                and issubclass(perms, permissions.BasePermission)
+            )
+            and not any(
+                isinstance(perms, class_)
+                for class_ in (
+                    permissions.OperandHolder,
+                    permissions.SingleOperandHolder
+                )
+            )
+        ):
             self._raise_validation_error(attr=attr)
 
     def _raise_attr_error(self, action_attr, general_attr):
